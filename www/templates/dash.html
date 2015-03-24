@@ -1,12 +1,14 @@
-// Entry portal to our app
+<!-- Entry portal to our app -->
 <ion-view view-title="Dashboard">
   <ion-content class="padding">
     
+    <!-- Default image/message to show -->
     <div class="image" ng-show="!hasTrash">
       <img src="./img/trio_overlap.jpg" alt="Trashee">
       <p>Sift your trash!</p>
     </div>
 
+    <!-- Card to show most recently sifted item -->
     <div class="list card" ng-show="hasTrash">
       <div class="item item-divider">Recently Sifted</div>
       <div class="item item-image">
@@ -20,6 +22,6 @@
 
   </ion-content>
   <ion-footer-bar class="button-bar bar-positive">
-    <button class="button button-icon button-clear icon ion-camera" ng-click="getPhoto()"></button>
+    <button class="button button-icon button-clear icon ion-camera" ng-click="process()"></button>
   </ion-footer-bar>
 </ion-view>

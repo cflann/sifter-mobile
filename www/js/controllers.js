@@ -9,16 +9,19 @@ angular.module('sifter.controllers', [])
   $scope.hasTrash = false;
   var temp;
 
-  $scope.getPhoto = function() {
+
+  $scope.process = function() {
     console.log('Initiating Camera intent');
     Camera.takePhoto({
       destinationType : navigator.camera.DestinationType.DATA_URL
     })
-    .then(function(imageURI) {
+    .then(function(encodedImage) {
       // show loading screen while awaiting response from server
       $scope.showLoading('Uploading...');
-      return ImgUpload.uploadImage(imageURI);
+      // upload image to Cloudinary storage
+      return ImgUpload.uploadImage(encodedImage);
     }, function(err) {
+      // hide loading screen if something goes wrong
       $scope.hideLoading();
       console.error('CAMERA ERROR:', err);
     })
@@ -26,14 +29,16 @@ angular.module('sifter.controllers', [])
       console.log('SUCCESSFUL UPLOAD:', response);
       // set our most recently scanned item url
       temp = transformURL(response.data.url, 1000);
-      // forward resulting url to server
+      // change loading message
       $scope.showLoading('Classifying...');
+      // forward resulting url to server for classification
       return SifterAPI.postImgUrl(response.data);
     })
     .then(function(response) {
       console.log('SUCCESSFUL CLASSIFICATION:', response);
       var data = response.data;
       $scope.hideLoading();
+      // set info for "Recently Sifted" card
       $scope.imageClassification = data.classification.toUpperCase();
       $scope.imageDescription = data.description.name.toUpperCase();
       $scope.imageURL = temp;
@@ -47,16 +52,19 @@ angular.module('sifter.controllers', [])
     });
   };
 
+  // displays an ionic loading screen
   $scope.showLoading = function(message) {
     $ionicLoading.show({
       template: '<ion-spinner></ion-spinner><div style="margin-top:5px">'+message+'</div>'
     });
   };
 
+  // hides our ionic loading screen
   $scope.hideLoading = function(){
     $ionicLoading.hide();
   };
 
+  // display our result as an ionic popup
   $scope.showClassification = function(classification) {
     var confirm = $ionicPopup.confirm({
       title: classification,
@@ -77,6 +85,7 @@ angular.module('sifter.controllers', [])
       ]
     });
 
+    // check if the user would like to scan another item
     confirm.then(function(res) {
       if (res) {
         console.log('Scanning another item');
@@ -89,6 +98,7 @@ angular.module('sifter.controllers', [])
     })
   };
 
+  // capitalize a string
   var capitalize = function(string) {
     return string.charAt(0).toUpperCase() + string.substring(1).toLowerCase();
   };

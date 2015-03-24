@@ -6,6 +6,7 @@ angular.module('sifter.services', [])
   var takePhoto = function(options) {
     var q = $q.defer();
 
+      // use cordova camera plugin to take a picture
       navigator.camera.getPicture(function(result) {
         q.resolve(result);
       }, function(err) {
